@@ -275,3 +275,69 @@ resetButton.addEventListener("click", () => {
 });
 
 window.addEventListener("beforeunload", stopMicrophone);
+
+const enrollButton = document.getElementById("enrollButton");
+const enrollStatus = document.getElementById("enrollStatus");
+const speakerIdInput = document.getElementById("speakerId");
+const displayNameInput = document.getElementById("displayName");
+
+if (enrollButton) {
+  enrollButton.addEventListener("click", async () => {
+    const audio = audioFile.files[0];
+
+    if (!audio) {
+      enrollStatus.textContent =
+        "Select a clear 15–60 second voice recording first.";
+      return;
+    }
+
+    const speakerId = speakerIdInput.value.trim();
+    const displayName = displayNameInput.value.trim();
+
+    if (!/^[A-Za-z0-9_.:-]{1,64}$/.test(speakerId)) {
+      enrollStatus.textContent =
+        "Use a speaker ID containing only letters, numbers, _, ., : or -.";
+      return;
+    }
+
+    enrollButton.disabled = true;
+    enrollButton.textContent = "Enrolling...";
+
+    try {
+      const form = new FormData();
+      form.append("speaker_id", speakerId);
+      form.append("display_name", displayName || "Trusted family member");
+      form.append("audio", audio);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/enroll",
+        { method: "POST", body: form }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          typeof result.detail === "string"
+            ? result.detail
+            : JSON.stringify(result.detail || result)
+        );
+      }
+
+      enrollStatus.textContent =
+        `Enrollment successful for "${speakerId}". You can now analyze another recording.`;
+
+      addLog(
+        "Trusted speaker enrolled",
+        `Speaker ID: ${speakerId}`
+      );
+    } catch (error) {
+      enrollStatus.textContent =
+        `Enrollment failed: ${error.message}`;
+      addLog("Enrollment failed", error.message);
+    } finally {
+      enrollButton.disabled = false;
+      enrollButton.textContent = "Enroll Selected Audio";
+    }
+  });
+}
