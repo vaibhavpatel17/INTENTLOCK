@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTENTLOCK | Voice Security</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">I</div>
+        <div>
+          <h2>INTENTLOCK</h2>
+          <p>VOICE SECURITY SYSTEM</p>
+        </div>
+      </div>
+
+      <nav>
+        <a href="#overview" class="nav-link active">◈ &nbsp; Overview</a>
+        <a href="#verification" class="nav-link">◎ &nbsp; Voice Verification</a>
+        <a href="#activity" class="nav-link">≡ &nbsp; Activity Log</a>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="status-dot"></span>
+        Prototype Mode
+        <p>All sensitive actions are simulated.</p>
+      </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">AI SECURITY / CONTROL CENTER</p>
+          <h1>Voice Security Dashboard</h1>
+          <p class="subtitle">Verify the speaker. Analyze the intent. Enforce authorization.</p>
+        </div>
+        <div class="system-status">
+          <span class="status-dot"></span>
+          Backend not connected
+        </div>
+      </header>
+
+      <section class="stats">
+        <article class="stat-card">
+          <p>DETECTION ENGINE</p>
+          <h3>Not connected</h3>
+          <span>Deepfake analysis pending</span>
+        </article>
+        <article class="stat-card">
+          <p>SPEAKER VERIFICATION</p>
+          <h3>Not connected</h3>
+          <span>Identity check pending</span>
+        </article>
+        <article class="stat-card">
+          <p>AUTHORIZATION</p>
+          <h3>Not evaluated</h3>
+          <span>Policy engine pending</span>
+        </article>
+      </section>
+
+      <section class="workspace" id="verification">
+        <article class="panel input-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">STEP 01</p>
+              <h2>Submit a voice request</h2>
+            </div>
+            <span class="tag">INPUT</span>
+          </div>
+
+          <p class="description">
+            Record a voice sample, upload an audio file, or enter text to
+            simulate a request. No real sensitive action will be executed.
+          </p>
+
+          <div class="record-area">
+            <div class="mic-icon">🎙</div>
+            <h3>Voice recording</h3>
+            <p id="recordStatus">Ready to record</p>
+            <button id="recordButton" class="button primary" type="button">
+              Start Recording
+            </button>
+            <p class="small-text">Your browser may ask for microphone permission.</p>
+          </div>
+
+          <div class="divider"><span>OR UPLOAD AUDIO</span></div>
+
+          <label class="field-label" for="audioFile">Audio file</label>
+          <input id="audioFile" type="file" accept="audio/*">
+          <p id="fileStatus" class="small-text">No file selected.</p>
+
+          <div class="divider"><span>OR USE TEXT INPUT</span></div>
+
+          <label class="field-label" for="requestText">Request to analyze</label>
+          <textarea id="requestText" rows="3"
+            placeholder="Example: Please approve a simulated account update."></textarea>
+
+          <label class="field-label" for="actionType">Requested action</label>
+          <select id="actionType">
+            <option value="general">General request</option>
+            <option value="account_update">Account update (simulation)</option>
+            <option value="file_transfer">File transfer (simulation)</option>
+            <option value="payment">Payment (simulation)</option>
+          </select>
+
+          <button id="analyzeButton" class="button primary full-width" type="button">
+            Analyze Request
+          </button>
+          <p class="small-text">Demo mode only. Real verification is not yet available.</p>
+        </article>
+
+        <article class="panel results-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">STEP 02</p>
+              <h2>Security assessment</h2>
+            </div>
+            <span class="tag">RESULTS</span>
+          </div>
+
+          <div class="notice">
+            <strong>Demo mode active</strong>
+            <p>Results here are simulated interface states, not actual AI verification.</p>
+          </div>
+
+          <div class="check-row">
+            <div>
+              <h3>Deepfake detection</h3>
+              <p>Checks whether audio may be synthetic or manipulated.</p>
+            </div>
+            <span class="result-pill pending" id="deepfakeStatus">Not checked</span>
+          </div>
+
+          <div class="check-row">
+            <div>
+              <h3>Speaker verification</h3>
+              <p>Checks whether the speaker matches an enrolled identity.</p>
+            </div>
+            <span class="result-pill pending" id="speakerStatus">Not checked</span>
+          </div>
+
+          <div class="check-row">
+            <div>
+              <h3>Intent and policy</h3>
+              <p>Evaluates the requested action and its authorization requirements.</p>
+            </div>
+            <span class="result-pill pending" id="policyStatus">Not checked</span>
+          </div>
+
+          <div class="decision-box" id="decisionBox">
+            <p class="eyebrow">FINAL DECISION</p>
+            <h2 id="decisionTitle">Awaiting input</h2>
+            <p id="decisionDescription">
+              Submit a request to see a clearly labelled demonstration.
+            </p>
+          </div>
+
+          <button id="resetButton" class="button secondary full-width" type="button">
+            Reset Assessment
+          </button>
+        </article>
+      </section>
+
+      <section class="panel activity-panel" id="activity">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">STEP 03</p>
+            <h2>Activity log</h2>
+          </div>
+          <span class="tag">LOCAL DEMO</span>
+        </div>
+
+        <div id="activityLog" class="activity-log" aria-live="polite">
+          <p class="empty-log">No requests submitted yet.</p>
+        </div>
+      </section>
+
+      <footer>
+        INTENTLOCK · Hackathon prototype · No real-world actions are performed.
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
