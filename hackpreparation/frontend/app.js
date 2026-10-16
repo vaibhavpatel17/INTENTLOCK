@@ -341,3 +341,37 @@ if (enrollButton) {
     }
   });
 }
+// Check whether the INTENTLOCK backend is running
+async function checkBackendConnection() {
+  const statusElement = document.querySelector(
+    ".status-pill"
+  );
+
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/api/health"
+    );
+
+    if (!response.ok) {
+      throw new Error("Backend health check failed");
+    }
+
+    const data = await response.json();
+
+    if (data.status === "ok") {
+      console.log("INTENTLOCK backend connected:", data);
+
+      if (statusElement) {
+        statusElement.textContent = "Backend connected";
+      }
+    }
+  } catch (error) {
+    console.error("Backend connection failed:", error);
+
+    if (statusElement) {
+      statusElement.textContent = "Backend not connected";
+    }
+  }
+}
+
+checkBackendConnection();
