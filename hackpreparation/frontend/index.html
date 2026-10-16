@@ -89,6 +89,25 @@
             <p class="small-text">Your browser may ask for microphone permission.</p>
           </div>
 
+          
+<div class="enrollment-box">
+  <h3>🔐 Register trusted voice</h3>
+  <label class="field-label" for="speakerId">Speaker ID</label>
+  <input id="speakerId" type="text"
+         value="family_member_1"
+         placeholder="family_member_1">
+  <label class="field-label" for="displayName">Display name</label>
+  <input id="displayName" type="text"
+         value="Trusted family member">
+  <button id="enrollButton" class="button secondary full-width"
+          type="button">
+    Enroll Selected Audio
+  </button>
+  <p id="enrollStatus" class="small-text">
+    Select a clear 15–60 second voice recording below, then enroll it.
+  </p>
+</div>
+
           <div class="divider"><span>OR UPLOAD AUDIO</span></div>
 
           <label class="field-label" for="audioFile">Audio file</label>
