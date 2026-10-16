@@ -151,55 +151,109 @@ audioFile.addEventListener("change", () => {
     "The file has not been analyzed by an AI model.");
 });
 
-analyzeButton.addEventListener("click", () => {
+
+analyzeButton.addEventListener("click", async () => {
   const text = requestText.value.trim();
   const selectedFile = audioFile.files[0];
-  const hasAudio = Boolean(selectedFile || recordedAudio);
+  const audio = selectedFile || recordedAudio;
 
-  if (!text && !hasAudio) {
-    decisionTitle.textContent = "Input required";
+  if (!audio) {
+    decisionTitle.textContent = "Audio required";
     decisionDescription.textContent =
-      "Enter a request, record audio, or select an audio file.";
-
-    addLog("Assessment not started",
-      "No request or audio was provided.");
+      "Record or upload audio before running real verification.";
+    addLog("Assessment not started", "No audio was provided.");
     return;
   }
 
-  resetAssessment();
+  const speakerId =
+    document.getElementById("speakerId")?.value.trim();
 
-  setStatus(deepfakeStatus, "Not connected");
-  setStatus(speakerStatus, "Not connected");
-  setStatus(policyStatus, "Demo only");
-
-  const action = actionType.value;
-  const sensitiveActions = [
-    "account_update",
-    "file_transfer",
-    "payment"
-  ];
-
-  if (sensitiveActions.includes(action)) {
-    decisionTitle.textContent = "Blocked in demo mode";
+  if (!speakerId) {
+    decisionTitle.textContent = "Speaker ID required";
     decisionDescription.textContent =
-      "This action requires real backend authorization. " +
-      "No action was executed.";
-    setStatus(policyStatus, "Blocked", "blocked");
-  } else {
-    decisionTitle.textContent = "Simulation only";
-    decisionDescription.textContent =
-      "Input received, but no AI verification or authorization " +
-      "was performed. Connect the backend for a real assessment.";
+      "Enroll a trusted speaker and enter their speaker ID.";
+    return;
   }
 
-  const inputType = hasAudio
-    ? "Audio supplied"
-    : "Text supplied";
+  analyzeButton.disabled = true;
+  analyzeButton.textContent = "Analyzing...";
+  setStatus(deepfakeStatus, "Checking...");
+  setStatus(speakerStatus, "Checking...");
+  setStatus(policyStatus, "Checking...");
+  decisionTitle.textContent = "Verification in progress";
+  decisionDescription.textContent =
+    "Waiting for DetectifAI. No sensitive action will be executed.";
 
-  addLog("Demo assessment created",
-    `${inputType}. Deepfake detection and speaker verification ` +
-    "were not performed. No sensitive action was executed.");
+  try {
+    const form = new FormData();
+    form.append("speaker_id", speakerId);
+    form.append("action_type", actionType.value);
+    form.append("request_text", text);
+
+    if (selectedFile) {
+      form.append("audio", selectedFile);
+    } else {
+      form.append("audio", audio, "recording.webm");
+    }
+
+    const response = await fetch("http://127.0.0.1:8000/api/analyze", {
+      method: "POST",
+      body: form
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.detail || "Verification request failed.");
+    }
+
+    const deepfake = result.deepfake_verdict || "not_sure";
+    const speaker = result.speaker_decision || "unknown";
+    const policy = result.policy || {};
+    const decision = policy.decision || "BLOCK";
+
+    setStatus(
+      deepfakeStatus,
+      deepfake,
+      deepfake === "real" ? "success" : "blocked"
+    );
+
+    setStatus(
+      speakerStatus,
+      speaker,
+      speaker === "match" ? "success" : "blocked"
+    );
+
+    setStatus(
+      policyStatus,
+      decision,
+      decision === "REQUIRES_CONFIRMATION" ||
+      decision === "REVIEW" ? "pending" : "blocked"
+    );
+
+    decisionTitle.textContent = decision.replaceAll("_", " ");
+    decisionDescription.textContent =
+      `${policy.reason || "No policy explanation returned."} ` +
+      "No real payment or sensitive action was executed.";
+
+    addLog(
+      "Real verification response received",
+      `Speaker: ${speaker}; deepfake: ${deepfake}; policy: ${decision}`
+    );
+  } catch (error) {
+    setStatus(deepfakeStatus, "Unavailable", "blocked");
+    setStatus(speakerStatus, "Unavailable", "blocked");
+    setStatus(policyStatus, "Blocked", "blocked");
+    decisionTitle.textContent = "Verification failed";
+    decisionDescription.textContent =
+      `${error.message} No sensitive action was executed.`;
+    addLog("Verification failed", error.message);
+  } finally {
+    analyzeButton.disabled = false;
+    analyzeButton.textContent = "Analyze Request";
+  }
 });
+
 
 resetButton.addEventListener("click", () => {
   if (isRecording && mediaRecorder &&
