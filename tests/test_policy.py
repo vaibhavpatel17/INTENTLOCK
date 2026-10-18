@@ -23,3 +23,7 @@ def test_fake_audio_is_blocked():
 def test_deepfakeverdict_uncertain():
     result=assess_request(action_type="payment",speaker_decision="match",deepfake_verdict="not_sure")
     assert result["decision"]=="BLOCK"
+
+def test_ifspeaker_tests_passes():
+    result=assess_request(action_type="payment",speaker_decision="match",deepfake_verdict="real")
+    assert result["decision"]=="REQUIRES_CONFIRMATION"

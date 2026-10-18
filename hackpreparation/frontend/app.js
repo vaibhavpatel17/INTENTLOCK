@@ -343,9 +343,9 @@ if (enrollButton) {
 }
 // Check whether the INTENTLOCK backend is running
 async function checkBackendConnection() {
-  const statusElement = document.querySelector(
-    ".status-pill"
-  );
+ const statusElement = document.querySelector(
+  ".system-status"
+);
 
   try {
     const response = await fetch(
@@ -358,19 +358,16 @@ async function checkBackendConnection() {
 
     const data = await response.json();
 
-    if (data.status === "ok") {
-      console.log("INTENTLOCK backend connected:", data);
-
-      if (statusElement) {
-        statusElement.textContent = "Backend connected";
-      }
-    }
+   if (data.status === "ok" && statusElement) {
+  statusElement.innerHTML =
+    '<span class="status-dot"></span> Backend connected';
+}
   } catch (error) {
     console.error("Backend connection failed:", error);
-
-    if (statusElement) {
-      statusElement.textContent = "Backend not connected";
-    }
+if (statusElement) {
+  statusElement.innerHTML =
+    '<span class="status-dot"></span> Backend not connected';
+}
   }
 }
 
