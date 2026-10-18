@@ -19,3 +19,7 @@ def test_fake_audio_is_blocked():
     result=assess_request(action_type="payment", speaker_decision="match", deepfake_verdict="fake",)
     #had i put the speaker_decision to no_match then our function would have returned and not checked deefake verdict 
     assert result["decision"] == "BLOCK"
+
+def test_deepfakeverdict_uncertain():
+    result=assess_request(action_type="payment",speaker_decision="match",deepfake_verdict="not_sure")
+    assert result["decision"]=="BLOCK"
