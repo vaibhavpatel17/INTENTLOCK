@@ -1,6 +1,13 @@
+from fastapi import FastAPI, HTTPException
+#fast api creates the backend applicationn
+#http exception==>lets our endpoint return appropriate HTTP errors 
+from pydantic import BaseModel
+import uuid
 
+app = FastAPI(title="INTENTLOCK API")
 
 @app.post("/api/request-number-change")
+#this is the endpoint decorator but the problem is app hasnt been defined
 def request_number_change(request: StartNumberChangeRequest):
     if not request.new_number.isdigit() or len(request.new_number) != 10:
         raise HTTPException(status_code=400, detail="Enter a valid 10-digit phone number.")
